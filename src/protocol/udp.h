@@ -1,12 +1,8 @@
-//
-// Created by 22064 on 2022/12/18.
-//
+#ifndef UDP_H
+#define UDP_H
 
-#ifndef NETWORKPROJECT_UDP_H
-#define NETWORKPROJECT_UDP_H
-
-#endif //NETWORKPROJECT_UDP_H
-
-#include <stdio.h>
+#include "../utils/common.h"
 
 void doit();
+
+#endif //UDP_H

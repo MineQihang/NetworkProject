@@ -1,8 +1,8 @@
-//
-// Created by 22064 on 2022/12/18.
-//
+#ifndef IP_H
+#define IP_H
 
-#ifndef NETWORKPROJECT_IP_H
-#define NETWORKPROJECT_IP_H
+#include "../utils/common.h"
 
-#endif //NETWORKPROJECT_IP_H
+void test();
+
+#endif //IP_H

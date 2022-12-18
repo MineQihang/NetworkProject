@@ -1,8 +1,0 @@
-//
-// Created by 22064 on 2022/12/18.
-//
-
-#ifndef NETWORKPROJECT_CHAT_H
-#define NETWORKPROJECT_CHAT_H
-
-#endif //NETWORKPROJECT_CHAT_H

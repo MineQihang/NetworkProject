@@ -1,8 +1,12 @@
-//
-// Created by 22064 on 2022/12/18.
-//
+#ifndef UNPACK_H
+#define UNPACK_H
 
-#ifndef NETWORKPROJECT_UNPACKAGE_H
-#define NETWORKPROJECT_UNPACKAGE_H
+#include "../protocol/ppp.h"
+#include "../protocol/ip.h"
+#include "../protocol/udp.h"
+#include "../protocol/scp.h"
 
-#endif //NETWORKPROJECT_UNPACKAGE_H
+
+scp_datagram* unpack(u8* sd);
+
+#endif //UNPACK_H

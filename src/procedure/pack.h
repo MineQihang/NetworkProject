@@ -1,13 +1,11 @@
-//
-// Created by 22064 on 2022/12/18.
-//
+#ifndef PACK_H
+#define PACK_H
 
-#ifndef NETWORKPROJECT_PACKAGE_H
-#define NETWORKPROJECT_PACKAGE_H
-
-#endif //NETWORKPROJECT_PACKAGE_H
-
-#include <stdio.h>
+#include "../protocol/ppp.h"
+#include "../protocol/ip.h"
 #include "../protocol/udp.h"
+#include "../protocol/scp.h"
 
-void test();
+u8* pack(scp_datagram* sd);
+
+#endif //PACK_H
