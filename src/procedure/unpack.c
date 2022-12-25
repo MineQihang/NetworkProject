@@ -1,24 +1,11 @@
 #include "unpack.h"
 
 
-scp_datagram* unpack(u8* data){
-    u8 len_m = *data;
-    printf("length of message: %hhu\n", len_m);
-
-    u8 len_data = strlen((char*)data + 1);
-    printf("length of data: %hhu\n", len_data);
-    u8 len_sn = len_data - len_m;
-    printf("length of sender_name: %hhu\n", len_sn);
-
-    char* message = (char*) malloc(len_m + 1);
-    memcpy(message, data + 1, len_m);
-    message[len_m] = '\0';
-    char* sender_name = (char*) malloc(len_sn + 1);
-    memcpy(sender_name, data + 1 + len_m, len_sn);
-
-    scp_datagram* sd = (scp_datagram*) malloc(sizeof(scp_datagram));
-    sd->message = message;
-    sd->sender_name = sender_name;
-
-    return sd;
+scp_message* unpack(u8* raw_data){
+    u8* ppp_data = unpack_ppp(raw_data);
+    u8* ip_data  = unpack_ip(ppp_data);
+    u8* udp_data = unpack_udp(ip_data);
+    u8* scp_data = unpack_scp(udp_data);
+    scp_message* sm = decode_message(scp_data);
+    return sm;
 }
