@@ -6,6 +6,6 @@
 #include "../protocol/udp.h"
 #include "../protocol/scp.h"
 
-u8* pack(scp_message* );
+u8 *pack(scp_message *);
 
 #endif //PACK_H

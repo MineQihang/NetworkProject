@@ -7,6 +7,6 @@
 #include "../protocol/scp.h"
 
 
-scp_message* unpack(u8* );
+scp_message *unpack(u8 *);
 
 #endif //UNPACK_H
