@@ -2,18 +2,104 @@
 #include "procedure/unpack.h"
 #include <pthread.h>
 
-int main() {
+char sender_name[255]; // 发送人名称
+
+int send_message(const char *message) {
+    // 发送信息
+    // 封装
     scp_message msg = {
-            "qihang",
-            "Hello, world!"
+            .sender_name = sender_name,
+            .message     = message
     };
+    u16 *len = malloc(sizeof(u16));
+    u8 *data = pack(&msg, len);
+    // 打开文件
+    FILE *fout;
+    if ((fout = fopen("./data", "wb")) == NULL) return -1;
+//    printf("0x%X\n", *data);
+    // 写入文件
+//    printf("len: %d\n", *len);
+    for (int i = 0; i < *len; i++)
+        fwrite(data + i, sizeof(u8), 1, fout);
+    fclose(fout);
+    return 1;
+}
 
-    u8* tmp = pack(&msg);
+int receive_message() {
+    // 接收信息
+    // 打开文件
+    FILE *fin;
+    if ((fin = fopen("./data", "rb")) == NULL) return -1;
+    // 读文件
+    fseek(fin, 0, SEEK_END);
+//    printf("%ld", ftell(fin));
+    int len = ftell(fin) / sizeof(u8);
+    if (len <= 0) return -1;
+    rewind(fin);
+//    printf("%d\n", len);
+    u8 *data = (u8 *) malloc(len * sizeof(u8));
+    fread(data, sizeof(u8), len, fin);
+    fclose(fin);
+    // 解封装
+//    printf("0x%X\n", *(data + 2));
+    scp_message *rec = unpack(data);
+//    printf("sender_name: %s\n", rec->sender_name);
+//    printf("message: %s\n", rec->message);
+    if(strcmp(rec->sender_name, sender_name) == 0) return 0;
+    else {
+        printf("[%s]:%s\n", rec->sender_name, rec->message);
+        while(remove("./data") != 0);
+        return 1;
+    }
+}
 
-    scp_message* rec = unpack(tmp);
+void flag_write() {
+    FILE *f;
+    while((f = fopen("./writing", "wb")) == NULL);
+    fclose(f);
+}
 
-    printf("sender_name: %s\n", rec->sender_name);
-    printf("message: %s\n", rec->message);
+void cancel_flag_write() {
+    remove("./writing");
+}
 
+int is_flag_write() {
+    FILE *f;
+    if((f = fopen("./writing", "rb")) == NULL) return 1;
+    fclose(f);
+    return 0;
+}
+
+void *send() {
+    while(1) {
+//        printf("[%s]:", sender_name);
+        char message[255];
+        if(gets(message) != NULL) {
+            while(strlen(message) <= 0) gets(message);
+            flag_write();
+            printf("[%s]:%s\n", sender_name, message);
+            while (send_message(message) <= 0);
+            cancel_flag_write();
+        }
+    }
+}
+
+void *receive() {
+    while (1) {
+        if(!is_flag_write()) continue;
+        receive_message();
+    }
+}
+
+int main() {
+    printf("Your name:");
+    scanf("%s", sender_name);
+
+    pthread_t sender;
+    pthread_t receiver;
+    pthread_create(&sender, NULL, send, NULL);
+    pthread_create(&receiver, NULL, receive, NULL);
+    pthread_join(sender, NULL);
+    pthread_join(receiver, NULL);
     return 0;
 }

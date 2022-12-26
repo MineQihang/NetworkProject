@@ -13,7 +13,7 @@ typedef struct scp_message {
     char *message;      // 发送信息
 } scp_message;
 
-u8 *pack_scp(u8 *, const u16 *);
+u8 *pack_scp(u8 *, u16 *);
 
 u8 *unpack_scp(u8 *);
 
