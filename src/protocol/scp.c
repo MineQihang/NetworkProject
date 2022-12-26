@@ -3,8 +3,11 @@
 u8 *pack_scp(u8 *data, u16 *len) {
     // 封装SCP数据报
     scp_header header = {
+            .version    =   1,
+            .type       =   0,
             .len        =   *len,
-            .send_time  =   32
+            .send_time  =   32,
+            .status     =   200
     };
     size_t header_size = sizeof(header);
     size_t data_size = *len;

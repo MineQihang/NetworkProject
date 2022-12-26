@@ -1,21 +1,35 @@
 #include "ip.h"
 
+u16 id = 0;
+
+u16 check_sum_ip(ip_header* header){
+    u32 sum = 0;
+    u16* hdata = (u16*) header;
+    for(int i = 0; i < sizeof(ip_header) / 2; i ++ )
+        sum += hdata[i];
+    sum = (sum >> 16) + (sum << 16 >> 16);
+    sum = (sum >> 16) + (sum << 16 >> 16);
+    return (u16) ~sum;
+}
+
 u8 *pack_ip(u8 *data, u16 *len) {
     // 封装IP数据报
     // 定义首部
     ip_header header = {
             .version    =   4,
-            .hlen       =   4,
+            .hlen       =   5,
             .ds         =   0,
-            .tlen       =   0,
-            .id         =   0,
+            .tlen       =   sizeof(header) + *len,
+            .id         =   id++,
             .flag_off   =   0,
-            .ttl        =   0,
-            .protocol   =   0,
+            .ttl        =   255,
+            .protocol   =   17,
             .hsum       =   0,
-            .saddr      =   0,
-            .daddr      =   1
+            .saddr      =   0x11223344,
+            .daddr      =   0x44332211
     };
+    header.hsum = check_sum_ip(&header);
+//    printf("%d\n", header.hsum);
     // 确定首部及数据大小
     size_t header_size = sizeof(header);
     size_t data_size = *len;
@@ -30,6 +44,11 @@ u8 *pack_ip(u8 *data, u16 *len) {
 u8 *unpack_ip(u8 *data) {
     // 解封装IP数据报
     ip_header header = *(ip_header *) data;
+    u16 sum = check_sum_ip(&header);
+    if(sum != 0) {
+        printf("Error: IP checksum is wrong!\n");
+        return NULL;
+    }
     size_t header_size = sizeof(header);
     u8 *unpacked_data = data + header_size;
     return unpacked_data;

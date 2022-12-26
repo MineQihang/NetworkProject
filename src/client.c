@@ -43,6 +43,7 @@ int receive_message() {
     // 解封装
 //    printf("0x%X\n", *(data + 2));
     scp_message *rec = unpack(data);
+    if(rec == NULL) return 1;
 //    printf("sender_name: %s\n", rec->sender_name);
 //    printf("message: %s\n", rec->message);
     if(strcmp(rec->sender_name, sender_name) == 0) return 0;
@@ -87,7 +88,7 @@ void *send() {
 void *receive() {
     while (1) {
         if(!is_flag_write()) continue;
-        receive_message();
+        if(receive_message() > 0) while(remove("./data") != 0);
     }
 }
 
