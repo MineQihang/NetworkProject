@@ -40,23 +40,6 @@ static u16 fcstab[256] = {
 };
 
 
-//tryfcs16(cp, len)
-//        register unsigned char *cp;
-//        register int len;
-//{
-//    u16 trialfcs;
-//
-//    /* add on output */
-//    trialfcs = pppfcs16( PPPINITFCS16, cp, len );
-//    trialfcs ^= 0xffff;                 /* complement */
-//    cp[len] = (trialfcs & 0x00ff);      /* least significant byte first */
-//    cp[len+1] = ((trialfcs >> 8) & 0x00ff);
-//    /* check on input */
-//    trialfcs = pppfcs16( PPPINITFCS16, cp, len + 2 );
-//    if ( trialfcs == PPPGOODFCS16 )
-//        printf("Good FCS\n");
-//}
-
 u16 get_fcs(u8 *data, u16 len) {
     u16 fcs = PPPINITFCS16;
     while (len--)
@@ -133,7 +116,7 @@ u8 *unpack_ppp(u8 *data) {
         ++p;
     }
     // CRC校验
-    data[0] = 3;
+//    data[0] = 3;
     u8 *tmp = data;
     u16 fcs = get_fcs(tmp, p - data);
     if (fcs != PPPGOODFCS16) {
