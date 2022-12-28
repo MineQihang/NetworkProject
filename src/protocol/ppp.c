@@ -73,15 +73,11 @@ u8 *pack_ppp(u8 *data, u16 *len) {
     size_t j = 0;
     u8 *p = packed_data + header_size;
     for (int i = 0; i < data_size; i++) {
-//        if(i < 10) printf("0x%X\n", data[i]);
         if (data[i] == 0x7E) p[j++] = 0x7D, p[j++] = 0x5E;
         else if (data[i] == 0x7D) p[j++] = 0x7D, p[j++] = 0x5D;
         else if (data[i] < 0x20) p[j++] = 0x7D, p[j++] = data[i] + 0x20;
         else p[j++] = data[i];
     }
-//    for(int i=0;i <10; i++) {
-//        printf("0x%X\n", *(packed_data + header_size + i));
-//    }
     // 由于这里不是在SONET/SDH链路上，因此不实现零比特填充
     data_size = j;
     *len = header_size + data_size;
@@ -92,11 +88,20 @@ u8 *pack_ppp(u8 *data, u16 *len) {
     // 插入尾部
     *len += footer_size;
     memcpy(packed_data + header_size + j, &footer, footer_size);
-//    printf("0x%X\n", *(packed_data + header_size + 2));
     return packed_data;
 }
 
 u8 *unpack_ppp(u8 *data) {
+    // 打印原始数据
+    if (show_proc) {
+        printf("raw data");
+        for (int i = 0;; i++) {
+            if (i > 5 && data[i - 2] == 0x7e) break;
+            if (i % 8 == 0) printf("\n");
+            printf("0x%02X ", data[i]);
+        };
+        printf("\n\n");
+    }
     // 解封装PPP帧
     ppp_header header = *(ppp_header *) data;
     size_t header_size = sizeof(header);
@@ -105,7 +110,6 @@ u8 *unpack_ppp(u8 *data) {
     size_t j = 0;
     // 字节填充后要解码
     while (1) {
-//        printf("0x%X\n", *p);
         if (*p == 0x7D) {
             ++p;
             if (*p == 0x5E) unpacked_data[j++] = 0x7E;
@@ -116,11 +120,11 @@ u8 *unpack_ppp(u8 *data) {
         ++p;
     }
     // CRC校验
-//    data[0] = 3;
+    // data[0] = 3;
     u8 *tmp = data;
     u16 fcs = get_fcs(tmp, p - data);
     if (fcs != PPPGOODFCS16) {
-        printf("Error: FCS is wrong!\n");
+        printf("Error: PPP FCS is wrong!\n");
         return NULL;
     }
     return unpacked_data;

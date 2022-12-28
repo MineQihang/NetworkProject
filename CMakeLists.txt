@@ -12,7 +12,6 @@ add_executable(Chat
         src/protocol/ip.c
         src/protocol/ppp.c
         src/utils/common.h
-#        debug/test.c
         )
 
 find_package(Threads REQUIRED)

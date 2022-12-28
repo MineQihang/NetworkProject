@@ -11,8 +11,8 @@ typedef struct ppp_header {
 } ppp_header;
 
 typedef struct ppp_footer {
-    u16 FCS;
-    u8  F;
+    u16 FCS;        // 帧校验序列
+    u8  F;          // 定界符
 } ppp_footer;
 
 

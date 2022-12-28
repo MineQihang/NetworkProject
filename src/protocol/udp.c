@@ -14,15 +14,18 @@ fake_header* get_fake_header(u8* data, u16 udp_len) {
 
 u16 check_sum(u8* udp_data, u16 udp_len, u8* data){
     u32 sum = 0;
+    // 获取伪首部
     u16* fheader = (u16*) get_fake_header(data, udp_len);
+    // 伪首部做反码加法
     for(int i = 0; i < sizeof(fake_header) / 2; i ++ )
         sum += fheader[i];
+    // UDP数据报做反码加法
     u16* tmp = (u16*) udp_data;
     for(int i = 0; i < udp_len / 2; i ++)
         sum += tmp[i];
     if(udp_len & 1) sum += ((u32)udp_data[udp_len-1]) << 16;
-    sum = (sum >> 16) + (sum << 16 >> 16);
-    sum = (sum >> 16) + (sum << 16 >> 16);
+    sum = (sum >> 16) + (sum & 0x0000ffff);
+    sum = (sum >> 16) + (sum & 0x0000ffff);  //再加一次防止进位
     return (u16) ~sum;
 }
 
@@ -44,8 +47,8 @@ u8 *pack_udp(u8 *data, u16 *len) {
     memcpy(packed_data, &header, header_size);
     memcpy(packed_data + header_size, data, data_size);
     header.sum = check_sum(packed_data, *len, data);
+    // 更新校验和
     memcpy(packed_data, &header, header_size);
-//    printf("%d\n", header.sum);
     return packed_data;
 }
 
@@ -53,8 +56,17 @@ u8 *unpack_udp(u8 *data) {
     // 解封装UDP数据报
     udp_header header = *(udp_header *) data;
     size_t header_size = sizeof(header);
+    // 打印UDP数据报
+    if(show_proc) {
+        printf("unpack: udp datagram");
+        for (int i = 0; i < header.len + header_size; i++) {
+            if (i % 8 == 0) printf("\n");
+            printf("0x%02X ", data[i]);
+        }
+        printf("\n\n");
+    }
     u8 *unpacked_data = data + header_size;
-//    data[0] = 234;
+    // data[0] = 234;
     u16 sum = check_sum(data, header.len + header_size, unpacked_data);
     if(sum != 0) {
         printf("Error: UDP checksum is wrong!\n");

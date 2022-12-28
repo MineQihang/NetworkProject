@@ -16,9 +16,9 @@ int send_message(const char *message) {
     // 打开文件
     FILE *fout;
     if ((fout = fopen("./data", "wb")) == NULL) return -1;
-//    printf("0x%X\n", *data);
+    // printf("0x%X\n", *data);
     // 写入文件
-//    printf("len: %d\n", *len);
+    // printf("len: %d\n", *len);
     for (int i = 0; i < *len; i++)
         fwrite(data + i, sizeof(u8), 1, fout);
     fclose(fout);
@@ -73,14 +73,13 @@ int is_flag_write() {
 
 void *send() {
     while(1) {
-//        printf("[%s]:", sender_name);
         char message[255];
         if(gets(message) != NULL) {
-            while(strlen(message) <= 0) gets(message);
-            flag_write();
+            while(strlen(message) <= 0) gets(message);  //获取用户输入
+            flag_write();     // 写信号
             printf("[%s]:%s\n", sender_name, message);
-            while (send_message(message) <= 0);
-            cancel_flag_write();
+            while (send_message(message) <= 0);    // 封装并发送
+            cancel_flag_write();   // 关闭写信号
         }
     }
 }
@@ -96,8 +95,8 @@ int main() {
     printf("Your name:");
     scanf("%s", sender_name);
 
-    pthread_t sender;
-    pthread_t receiver;
+    pthread_t sender;     // 发送线程
+    pthread_t receiver;   // 接收线程
     pthread_create(&sender, NULL, send, NULL);
     pthread_create(&receiver, NULL, receive, NULL);
     pthread_join(sender, NULL);
