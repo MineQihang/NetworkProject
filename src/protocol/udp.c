@@ -1,6 +1,15 @@
 #include "udp.h"
 #include "ip.h"
 
+void print_udp_header(udp_header* header) {
+    printf("========== ppp header ==========\n");
+    printf("src_port: %d\n", header->src_port);
+    printf("des_port: %d\n", header->des_port);
+    printf("len: %d\n", header->len);
+    printf("sum: %d\n", header->sum);
+    printf("\n");
+}
+
 fake_header* get_fake_header(u8* data, u16 udp_len) {
     ip_header header = *(ip_header *) data;
     fake_header* fheader = (fake_header*) malloc(sizeof(fake_header));
@@ -49,6 +58,7 @@ u8 *pack_udp(u8 *data, u16 *len) {
     header.sum = check_sum(packed_data, *len, data);
     // 更新校验和
     memcpy(packed_data, &header, header_size);
+    if(show_proc) print_udp_header(&header);
     return packed_data;
 }
 
@@ -58,13 +68,10 @@ u8 *unpack_udp(u8 *data) {
     size_t header_size = sizeof(header);
     // 打印UDP数据报
     if(show_proc) {
-        printf("unpack: udp datagram");
-        for (int i = 0; i < header.len + header_size; i++) {
-            if (i % 8 == 0) printf("\n");
-            printf("0x%02X ", data[i]);
-        }
-        printf("\n\n");
+        print_hex(data, header.len + header_size, "unpack: udp datagram");
+        print_udp_header(&header);
     }
+    // 解封装
     u8 *unpacked_data = data + header_size;
     // data[0] = 234;
     u16 sum = check_sum(data, header.len + header_size, unpacked_data);

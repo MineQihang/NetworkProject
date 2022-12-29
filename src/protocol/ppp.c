@@ -1,5 +1,18 @@
 #include "ppp.h"
 
+
+void print_ppp_header_footer (ppp_header* header, ppp_footer* footer) {
+    printf("========== ppp header ==========\n");
+    printf("F: %d\n", header->F);
+    printf("A: %d\n", header->A);
+    printf("C: %d\n", header->C);
+    printf("protocol: %d\n", header->protocol);
+    printf("========== ppp footer ==========\n");
+    printf("FCS: %d\n", footer->FCS);
+    printf("F: %d\n", footer->F);
+    printf("\n");
+}
+
 // 部分代码来自RFC1662
 #define PPPINITFCS16    0xffff  /* Initial FCS value */
 #define PPPGOODFCS16    0xf0b8  /* Good final FCS value */
@@ -88,20 +101,11 @@ u8 *pack_ppp(u8 *data, u16 *len) {
     // 插入尾部
     *len += footer_size;
     memcpy(packed_data + header_size + j, &footer, footer_size);
+    if(show_proc) print_ppp_header_footer(&header, &footer);
     return packed_data;
 }
 
 u8 *unpack_ppp(u8 *data) {
-    // 打印原始数据
-    if (show_proc) {
-        printf("raw data");
-        for (int i = 0;; i++) {
-            if (i > 5 && data[i - 2] == 0x7e) break;
-            if (i % 8 == 0) printf("\n");
-            printf("0x%02X ", data[i]);
-        };
-        printf("\n\n");
-    }
     // 解封装PPP帧
     ppp_header header = *(ppp_header *) data;
     size_t header_size = sizeof(header);
@@ -118,6 +122,11 @@ u8 *unpack_ppp(u8 *data) {
         } else if (*p == 0x7E) break;
         else unpacked_data[j++] = *p;
         ++p;
+    }
+    // 打印原始数据
+    if (show_proc) {
+        print_hex(data, p - data + 2, "raw data");
+        print_ppp_header_footer(&header, (ppp_footer*)(p - 2));
     }
     // CRC校验
     // data[0] = 3;

@@ -1,5 +1,15 @@
 #include "scp.h"
 
+void print_scp_header(scp_header* header) {
+    printf("========== scp header ==========\n");
+    printf("version: %d\n", header->version);
+    printf("type: %d\n", header->type);
+    printf("len: %d\n", header->len);
+    printf("send_time: %d\n", header->len);
+    printf("status: %d\n", header->status);
+    printf("\n");
+}
+
 u8 *pack_scp(u8 *data, u16 *len) {
     // 封装SCP数据报
     scp_header header = {
@@ -15,6 +25,7 @@ u8 *pack_scp(u8 *data, u16 *len) {
     u8 *packed_data = malloc(*len);
     memcpy(packed_data, &header, header_size);
     memcpy(packed_data + header_size, data, data_size);
+    if(show_proc) print_scp_header(&header);
     return packed_data;
 }
 
@@ -24,12 +35,8 @@ u8 *unpack_scp(u8 *data) {
     size_t header_size = sizeof(header);
     // 打印SCP数据报
     if(show_proc) {
-        printf("unpack: scp datagram");
-        for (int i = 0; i < header.len + header_size; i++) {
-            if (i % 8 == 0) printf("\n");
-            printf("0x%02X ", data[i]);
-        }
-        printf("\n\n");
+        print_hex(data, header.len + header_size, "unpack: scp datagram");
+        print_scp_header(&header);
     }
     u8 *unpacked_data = data + header_size;
     return unpacked_data;

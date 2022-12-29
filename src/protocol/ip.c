@@ -1,5 +1,21 @@
 #include "ip.h"
 
+void print_ip_header(ip_header *header) {
+    printf("========== ip header ==========\n");
+    printf("version: %d\n", header->version);
+    printf("hlen: %d\n", header->hlen);
+    printf("ds: %d\n", header->ds);
+    printf("tlen: %d\n", header->tlen);
+    printf("id: %d\n", header->id);
+    printf("flag_off: %d\n", header->flag_off);
+    printf("ttl: %d\n", header->ttl);
+    printf("protocol: %d\n", header->protocol);
+    printf("hsum: %d\n", header->hsum);
+    printf("saddr: %d\n", header->saddr);
+    printf("daddr: %d\n", header->daddr);
+    printf("\n");
+}
+
 u16 id = 0;
 
 u16 check_sum_ip(ip_header* header){
@@ -38,6 +54,7 @@ u8 *pack_ip(u8 *data, u16 *len) {
     u8 *packed_data = malloc(*len);
     memcpy(packed_data, &header, header_size);
     memcpy(packed_data + header_size, data, data_size);
+    if(show_proc) print_ip_header(&header);
     return packed_data;
 }
 
@@ -46,12 +63,8 @@ u8 *unpack_ip(u8 *data) {
     ip_header header = *(ip_header *) data;
     // 打印IP数据报
     if(show_proc) {
-        printf("unpack: ip datagram");
-        for (int i = 0; i < header.tlen; i++) {
-            if (i % 8 == 0) printf("\n");
-            printf("0x%02X ", data[i]);
-        }
-        printf("\n\n");
+        print_hex(data, header.tlen, "unpack: ip datagram");
+        print_ip_header(&header);
     }
     // header.daddr = 0x12345678;
     u16 sum = check_sum_ip(&header);
