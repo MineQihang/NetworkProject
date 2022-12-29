@@ -129,7 +129,7 @@ u8 *unpack_ppp(u8 *data) {
         print_ppp_header_footer(&header, (ppp_footer*)(p - 2));
     }
     // CRC校验
-    // data[0] = 3;
+//    data[0] = 3;
     u8 *tmp = data;
     u16 fcs = get_fcs(tmp, p - data);
     if (fcs != PPPGOODFCS16) {

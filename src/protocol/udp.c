@@ -73,7 +73,7 @@ u8 *unpack_udp(u8 *data) {
     }
     // 解封装
     u8 *unpacked_data = data + header_size;
-    // data[0] = 234;
+//    data[0] = 234;
     u16 sum = check_sum(data, header.len + header_size, unpacked_data);
     if(sum != 0) {
         printf("Error: UDP checksum is wrong!\n");

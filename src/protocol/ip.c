@@ -66,7 +66,7 @@ u8 *unpack_ip(u8 *data) {
         print_hex(data, header.tlen, "unpack: ip datagram");
         print_ip_header(&header);
     }
-    // header.daddr = 0x12345678;
+//     header.daddr = 0x12345678;
     u16 sum = check_sum_ip(&header);
     if(sum != 0) {
         printf("Error: IP checksum is wrong!\n");
