@@ -2,7 +2,7 @@
 #include "ip.h"
 
 void print_udp_header(udp_header* header) {
-    printf("========== ppp header ==========\n");
+    printf("========== udp header ==========\n");
     printf("src_port: %d\n", header->src_port);
     printf("des_port: %d\n", header->des_port);
     printf("len: %d\n", header->len);
